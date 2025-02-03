@@ -28,11 +28,11 @@ jobs:
       - name: Build Docker image
         id: build-image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2 .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4 .
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2
+          docker push ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4
 
   deploy:
     name: Deploy
@@ -62,8 +62,8 @@ jobs:
             sudo docker images
 
             # Pull the latest Docker image with the custom tag
-            echo "Pulling Docker image: ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2"
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2
+            echo "Pulling Docker image: ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4"
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4
 
             # Check if pull was successful
             if [ $? -ne 0 ]; then
@@ -72,15 +72,15 @@ jobs:
             fi
 
             # Stop and remove existing container if it exists
-            if [ "$(sudo docker ps -q -f name=${{ secrets.SERVICE_NAME }}-1.1.2)" ]; then
+            if [ "$(sudo docker ps -q -f name=${{ secrets.SERVICE_NAME }}-1.1.4)" ]; then
               echo "Stopping and removing existing container..."
-              sudo docker stop ${{ secrets.SERVICE_NAME }}-1.1.2
-              sudo docker rm ${{ secrets.SERVICE_NAME }}-1.1.2
+              sudo docker stop ${{ secrets.SERVICE_NAME }}-1.1.4
+              sudo docker rm ${{ secrets.SERVICE_NAME }}-1.1.4
             fi
 
             # Remove old images of the backend project
             echo "Removing old Docker images..."
-            old_images=$(sudo docker images ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2 -q | tail -n +2)
+            old_images=$(sudo docker images ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4 -q | tail -n +2)
             if [ -n "$old_images" ]; then
               echo "Removing old images: $old_images"
               sudo docker rmi -f $old_images || true
@@ -97,14 +97,14 @@ jobs:
 
             # Run the new Docker container with the custom tag
             echo "Starting new container..."
-            sudo docker run -d --name ${{ secrets.SERVICE_NAME }}-1.1.2 -p ${{ secrets.APP_PORT }}:3000 ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2
+            sudo docker run -d --name ${{ secrets.SERVICE_NAME }}-1.1.4 -p ${{ secrets.APP_PORT }}:3000 ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4
 
             # Verify the container is running
             echo "Verifying the container is running..."
-            sudo docker ps -a | grep ${{ secrets.SERVICE_NAME }}-1.1.2
+            sudo docker ps -a | grep ${{ secrets.SERVICE_NAME }}-1.1.4
 
             # Log the image ID for reference
-            echo "Deployed image ID: $(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.2)"
+            echo "Deployed image ID: $(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-1.1.4)"
 
             # Cleanup dangling images & unused Docker data
             echo "Cleaning up unused Docker data..."
