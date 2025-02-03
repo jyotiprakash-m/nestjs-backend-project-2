@@ -2,7 +2,7 @@ name: Deploy to Docker Versioning on EC2
 
 on:
   push:
-    branches: ['master']
+    branches: ['main']
 
 permissions:
   contents: read
