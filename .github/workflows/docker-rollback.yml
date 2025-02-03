@@ -19,11 +19,6 @@ jobs:
     steps:
         - name: Deploy rollback on EC2
           uses: appleboy/ssh-action@v0.1.7
-          env:
-            DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/vdr-services
-            IMAGE_TAG: ${{ secrets.SERVICE_NAME }}
-            NEW_VERSION: ${{ github.event.inputs.new-version }}
-            CURRENT_VERSION: ${{ github.event.inputs.current-version }}
           with:
             host: ${{ secrets.EC2_HOST }}
             username: ${{ secrets.EC2_USER }}
@@ -40,19 +35,19 @@ jobs:
                 sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-${{github.event.inputs.new-version}})
             
                 # Stop current container 
-                sudo docker stop service-${{ github.event.inputs.current-version }} || true
-                sudo docker rm service-${{ github.event.inputs.current-version }} || true
+                sudo docker stop ${{ secrets.SERVICE_NAME }}-${{ github.event.inputs.current-version }} || true
+                sudo docker rm ${{ secrets.SERVICE_NAME }}-${{ github.event.inputs.current-version }} || true
             
                 # Start previous version 
                 sudo docker run -d \
-                --name service-${{ github.event.inputs.new-version }} \
+                --name ${{ secrets.SERVICE_NAME }}-${{ github.event.inputs.new-version }} \
                 -p ${{ secrets.APP_PORT }}:3000 \
                 ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ github.event.inputs.new-version }}
 
 
                 # Verify the container is running
                 echo "Verifying the container is running..."
-                sudo docker ps -a | grep ${{ secrets.SERVICE_NAME }}
+                sudo docker ps -a | grep ${{ secrets.SERVICE_NAME }}-${{ github.event.inputs.new-version }}
 
                 # Log the image ID for reference
                 echo "Deployed image ID: $(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/vdr-services:${{ secrets.SERVICE_NAME }}-${{ github.event.inputs.current-version }})"
