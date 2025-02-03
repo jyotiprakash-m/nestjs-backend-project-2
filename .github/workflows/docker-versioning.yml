@@ -71,11 +71,11 @@ jobs:
               exit 1
             fi
 
-            # Stop and remove existing container if it exists
-            if [ "$(sudo docker ps -q -f name=${{ secrets.SERVICE_NAME }}-1.1.4)" ]; then
+            # Stop and remove existing container if it exists (Last version)
+            if [ "$(sudo docker ps -q -f name=${{ secrets.SERVICE_NAME }}-1.1.1)" ]; then
               echo "Stopping and removing existing container..."
-              sudo docker stop ${{ secrets.SERVICE_NAME }}-1.1.4
-              sudo docker rm ${{ secrets.SERVICE_NAME }}-1.1.4
+              sudo docker stop ${{ secrets.SERVICE_NAME }}-1.1.1
+              sudo docker rm ${{ secrets.SERVICE_NAME }}-1.1.1
             fi
 
             # Remove old images of the backend project
